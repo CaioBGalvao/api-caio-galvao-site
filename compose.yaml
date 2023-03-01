@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  backend:
+    image: node:18.14.2-apine3.16
+    platform: linux/x86_64 # para o MAC
+    container_name: galvao-api-backend
+    build: ./
+    working_dir: /home/node/app
+    volumes:
+      - ./:/home/node/app
+    tty: true
+    stdin_open: true
+    command: bash
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - ${BACKEND_PORT}:3000
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      HOSTNAME: db
+      JWT_SECRET: ${JWT_SECRET}
+    networks:
+      - virtual_lan_Back-to-DB
+
+  db:
+    image: mysql:8.0.32
+    platform: linux/x86_64 # para o MAC
+    container_name: galvao-api-db
+    restart: always
+    ports:
+      - ${DB_PORT}:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: galvao-db
+    networks:
+      - virtual_lan_Back-to-DB
+    cap_add:
+      - SYS_NICE
+
+networks:
+  virtual_lan_Back-to-DB: {}
